@@ -1,0 +1,14 @@
+[core]
+	repositoryformatversion = 0
+	filemode = false
+	bare = false
+	logallrefupdates = true
+	symlinks = false
+	ignorecase = true
+[branch "main"]
+	vscode-merge-base = origin/main
+[branch "master"]
+	vscode-merge-base = origin/master
+[remote "rifa-app"]
+	url = https://github.com/omarfer26/rifa-app.git
+	fetch = +refs/heads/*:refs/remotes/rifa-app/*
