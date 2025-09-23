@@ -1,6 +1,7 @@
 "use client"
 
 import { useState, useEffect } from "react"
+import Image from "next/image"
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
@@ -9,7 +10,6 @@ import { X } from "lucide-react"
 import { Check } from "lucide-react"
 import * as XLSX from "xlsx"
 
-// Define the registration type
 interface Registration {
     number: string
     nombre: string
@@ -17,14 +17,11 @@ interface Registration {
     pago?: boolean
 }
 
-// Consistent localStorage key
 const API_URL = "http://localhost:5000/registro"
 
 export default function NumberTable() {
-    // Generate numbers from 00 to 99
     const numbers = Array.from({ length: 100 }, (_, i) => i.toString().padStart(2, "0"))
 
-    // State for modals and form
     const [isRegisterModalOpen, setIsRegisterModalOpen] = useState(false)
     const [isViewModalOpen, setIsViewModalOpen] = useState(false)
     const [selectedNumber, setSelectedNumber] = useState("")
@@ -37,28 +34,14 @@ export default function NumberTable() {
     const [searchResults, setSearchResults] = useState<string[]>([])
     const [hashmap, setHashmap] = useState<Map<string, string[]>>(new Map())
 
-    // Load registrations from localStorage on component mount
     useEffect(() => {
         fetch(API_URL)
             .then(res => res.json())
             .then(data => {
                 setRegistrations(data)
                 setLoading(false)
-            })
-            .catch(error => {
-                console.error("Error fetching data:", error)
-                setLoading(false)
-            })
-    }, [])
 
-    useEffect(() => {
-        fetch(API_URL)
-            .then(res => res.json())
-            .then(data => {
-                setRegistrations(data)
-                setLoading(false)
-    
-                const newHashmap = new Map<string, string[]>();
+                const newHashmap = new Map<string, string[]>()
                 data.forEach((reg: { nombre: string; number: string }) => {
                     reg.nombre.split(" ").forEach((word: string) => {
                         const lowerWord = word.toLowerCase()
@@ -68,7 +51,6 @@ export default function NumberTable() {
                         newHashmap.get(lowerWord)?.push(reg.number)
                     })
                 })
-    
                 setHashmap(newHashmap)
             })
             .catch(error => {
@@ -88,7 +70,7 @@ export default function NumberTable() {
             hashmap.get(word)?.forEach(num => matchingNumbers.add(num))
         })
         setSearchResults(Array.from(matchingNumbers))
-    }, [ searchQuery,hashmap])
+    }, [searchQuery, hashmap])
 
     const isNumberRegistered = (number: string) => {
         return registrations.some(reg => reg.number === number)
@@ -112,9 +94,9 @@ export default function NumberTable() {
             alert("Por favor complete todos los campos")
             return
         }
-    
+
         const newRegistration = { number: selectedNumber, nombre, telefono, pago }
-    
+
         try {
             const response = await fetch(API_URL, {
                 method: "POST",
@@ -126,13 +108,13 @@ export default function NumberTable() {
                 setIsRegisterModalOpen(false)
                 setNombre("")
                 setTelefono("")
-                setPago(false) // Reset después de registrar
+                setPago(false)
             }
         } catch (error) {
             console.error("Error saving registration:", error)
         }
     }
-    
+
     const handleConfirmPay = async () => {
         try {
             const response = await fetch(`${API_URL}/${selectedNumber}`, {
@@ -144,7 +126,7 @@ export default function NumberTable() {
                 setRegistrations(registrations.map(reg =>
                     reg.number === selectedNumber ? { ...reg, pago: true } : reg
                 ))
-                setPago(true) // Actualizar el estado
+                setPago(true)
                 setIsViewModalOpen(false)
             }
         } catch (error) {
@@ -173,205 +155,226 @@ export default function NumberTable() {
     }
 
     const generateExcel = () => {
-        // Definir el tipo de los registros
         type Registro = {
-            ID: number;
-            Número: string;
-            Nombre: string;
-            Teléfono: string;
-            Pago: string;
-        };
+            ID: number
+            Número: string
+            Nombre: string
+            Teléfono: string
+            Pago: string
+        }
 
         const dataWithIds: Registro[] = registrations.map((reg, index) => ({
-            ID: index + 1, // Asigna un ID basado en el índice
+            ID: index + 1,
             Número: reg.number.toString(),
             Nombre: reg.nombre,
             Teléfono: reg.telefono,
             Pago: reg.pago ? "Sí" : "No"
-            
-        }));
+        }))
 
-        const ws = XLSX.utils.json_to_sheet(dataWithIds);
+        const ws = XLSX.utils.json_to_sheet(dataWithIds)
 
-        // Ajustar automáticamente el ancho de las columnas
         const colWidths = Object.keys(dataWithIds[0]).map((key: string) => ({
             wch: Math.max(
-                key.length, // Longitud del encabezado
-                ...dataWithIds.map(row => row[key as keyof Registro]?.toString().length ?? 10) // Longitud máxima de los datos
-            ) + 2 // Margen extra
-        }));
+                key.length,
+                ...dataWithIds.map(row => row[key as keyof Registro]?.toString().length ?? 10)
+            ) + 2
+        }))
 
-        ws["!cols"] = colWidths;
+        ws["!cols"] = colWidths
 
-        const wb = XLSX.utils.book_new();
-        XLSX.utils.book_append_sheet(wb, ws, "Registros");
-        XLSX.writeFile(wb, "rifa_registrations.xlsx");
-    };
-            return (
+        const wb = XLSX.utils.book_new()
+        XLSX.utils.book_append_sheet(wb, ws, "Registros")
+        XLSX.writeFile(wb, "rifa_registrations.xlsx")
+    }
+
+    return (
         <div className="flex flex-row justify-center items-start gap-6 p-6">
+            <section className="p-6 bg-rose-100 mt-25 rounded-lg shadow-lg max-w-xs text-center">
+                    <Image
+                        src="/foto.jpg"
+                        alt="Premio"
+                        width={250}
+                        height={250}
+                        className="rounded-lg shadow-md"
+                    />
+                    <p className="text-center mt-2 font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                        Premio:
+                    </p>
+            </section>
+
             <section className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg max-w-3xl">
-            <h1
-                className="text-4xl font-bold mb-6 text-center text-rose-600"
-                style={{fontFamily: "'Comic Sans MS', cursive"}}
-            >
-                Gran rifa para recaudar fondos
-            </h1>
+                <h1
+                    className="text-4xl font-bold mb-6 text-center text-rose-600"
+                    style={{ fontFamily: "'Comic Sans MS', cursive" }}
+                >
+                    Gran rifa
+                </h1>
 
-            <div className="border-4 border-rose-500 rounded-md overflow-hidden bg-white">
-                <table className="border-collapse">
-                    <tbody>
-                    {Array.from({length: 10}, (_, rowIndex) => (
-                        <tr key={rowIndex}>
-                            {Array.from({length: 10}, (_, colIndex) => {
-                                const index = rowIndex * 10 + colIndex
-                                const number = numbers[index]
-                                const registered = isNumberRegistered(number)
-                                const highlighted = searchResults.includes(number)
+                <div className="border-4 border-rose-500 rounded-md overflow-hidden bg-white">
+                    <table className="border-collapse">
+                        <tbody>
+                            {Array.from({ length: 10 }, (_, rowIndex) => (
+                                <tr key={rowIndex}>
+                                    {Array.from({ length: 10 }, (_, colIndex) => {
+                                        const index = rowIndex * 10 + colIndex
+                                        const number = numbers[index]
+                                        const registered = isNumberRegistered(number)
+                                        const highlighted = searchResults.includes(number)
 
-                                return (
-                                    <td
-                                        key={colIndex}
-                                        className={`border border-rose-300 w-12 h-12 text-center hover:bg-rose-100 transition-colors cursor-pointer relative ${registered ? "bg-rose-50" : ""} ${highlighted ? "bg-yellow-200" : ""}`}
-                                        style={{fontFamily: "'Comic Sans MS', cursive"}}
-                                        onClick={() => handleNumberClick(number)}
-                                    >
-                                        {number}
-                                        {registered && (
-                                            <div className="absolute inset-0 flex items-center justify-center text-rose-600 font-bold text-3xl">
-                                            {getRegistration(number)?.pago ? (
-                                                <Check className="w-8 h-8 stroke-2 text-green-600" />
-                                            ) : (
-                                                <X className="w-8 h-8 stroke-2" />
-                                            )}
-                                        </div>
-                                    )}
-                                    </td>
-                                )
-                            })}
-                        </tr>
-                    ))}
-                    </tbody>
-                </table>
-            </div>
+                                        return (
+                                            <td
+                                                key={colIndex}
+                                                className={`border border-rose-300 w-12 h-12 text-center hover:bg-rose-100 transition-colors cursor-pointer relative ${registered ? "bg-rose-50" : ""} ${highlighted ? "bg-yellow-200" : ""}`}
+                                                style={{ fontFamily: "'Comic Sans MS', cursive" }}
+                                                onClick={() => handleNumberClick(number)}
+                                            >
+                                                {number}
+                                                {registered && (
+                                                    <div className="absolute inset-0 flex items-center justify-center text-rose-600 font-bold text-3xl">
+                                                        {getRegistration(number)?.pago ? (
+                                                            <Check className="w-8 h-8 stroke-2 text-green-600" />
+                                                        ) : (
+                                                            <X className="w-8 h-8 stroke-2" />
+                                                        )}
+                                                    </div>
+                                                )}
+                                            </td>
+                                        )
+                                    })}
+                                </tr>
+                            ))}
+                        </tbody>
+                    </table>
+                </div>
+                <br></br>                            
+                <div className="mt-4 text-xs text-gray-500">Registros guardados: {registrations.length}</div>
+                <br />
+                <Button onClick={generateExcel} className="mb-4 bg-green-500 hover:bg-green-600">
+                    Descargar Registros
+                </Button>
 
-            {/* Debug info - can be removed in production */}
-            <div className="mt-4 text-xs text-gray-500">Registros guardados: {registrations.length}</div>
-            <br></br>
-            <Button onClick={generateExcel} className="mb-4 bg-green-500 hover:bg-green-600">Descargar
-                Registros</Button>
+                <Input
+                    type="text"
+                    placeholder="Buscar por nombre..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="mb-4 w-80 p-2 border border-gray-400 rounded"
+                />
 
-            <Input
-                type="text"
-                placeholder="Buscar por nombre..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="mb-4 w-80 p-2 border border-gray-400 rounded"
-            />
+                <Dialog open={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle className="text-center text-xl" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                Número: {selectedNumber}
+                            </DialogTitle>
+                        </DialogHeader>
 
-            {/* Register Modal Dialog */}
-            <Dialog open={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle className="text-center text-xl" style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                            Número: {selectedNumber}
-                        </DialogTitle>
-                    </DialogHeader>
-
-                    <div className="grid gap-4 py-4">
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="nombre" className="text-right"
-                                   style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                                Nombre
-                            </Label>
-                            <Input
-                                id="nombre"
-                                value={nombre}
-                                onChange={(e) => setNombre(e.target.value)}
-                                className="col-span-3"
-                                style={{fontFamily: "'Comic Sans MS', cursive"}}
-                            />
-                        </div>
-
-                        <div className="grid grid-cols-4 items-center gap-4">
-                            <Label htmlFor="telefono" className="text-right"
-                                   style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                                Teléfono
-                            </Label>
-                            <Input
-                                id="telefono"
-                                value={telefono}
-                                onChange={(e) => setTelefono(e.target.value)}
-                                className="col-span-3"
-                                style={{fontFamily: "'Comic Sans MS', cursive"}}
-                            />
-                        </div>
-                    </div>
-                    <DialogFooter>
-                        <Button
-                            onClick={handleRegister}
-                            className="bg-rose-500 hover:bg-rose-600"
-                            style={{fontFamily: "'Comic Sans MS', cursive"}}
-                        >
-                            Anotar
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
-
-            {/* View/Delete Modal Dialog */}
-            <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-                <DialogContent className="sm:max-w-[425px]">
-                    <DialogHeader>
-                        <DialogTitle className="text-center text-xl" style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                            Número: {selectedNumber}
-                        </DialogTitle>
-                    </DialogHeader>
-
-                    {selectedNumber && isNumberRegistered(selectedNumber) && (
                         <div className="grid gap-4 py-4">
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right font-bold"
-                                       style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                                    Nombre:
+                                <Label htmlFor="nombre" className="text-right" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                    Nombre
                                 </Label>
-                                <div className="col-span-3" style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                                    {getRegistration(selectedNumber)?.nombre}
-                                </div>
+                                <Input
+                                    id="nombre"
+                                    value={nombre}
+                                    onChange={(e) => setNombre(e.target.value)}
+                                    className="col-span-3"
+                                    style={{ fontFamily: "'Comic Sans MS', cursive" }}
+                                />
                             </div>
 
                             <div className="grid grid-cols-4 items-center gap-4">
-                                <Label className="text-right font-bold"
-                                       style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                                    Teléfono:
+                                <Label htmlFor="telefono" className="text-right" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                    Teléfono
                                 </Label>
-                                <div className="col-span-3" style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                                    {getRegistration(selectedNumber)?.telefono}
-                                </div>
+                                <Input
+                                    id="telefono"
+                                    value={telefono}
+                                    onChange={(e) => setTelefono(e.target.value)}
+                                    className="col-span-3"
+                                    style={{ fontFamily: "'Comic Sans MS', cursive" }}
+                                />
                             </div>
                         </div>
-                    )}
+                        <DialogFooter>
+                            <Button
+                                onClick={handleRegister}
+                                className="bg-rose-500 hover:bg-rose-600"
+                                style={{ fontFamily: "'Comic Sans MS', cursive" }}
+                            >
+                                Anotar
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
 
-                    <DialogFooter>
-                        <Button onClick={handleDelete} variant="destructive"
-                                style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                            Eliminar
-                        </Button>
-                        <Button onClick={handleConfirmPay} className="bg-green-500 hover:bg-green-600"
-                                style={{fontFamily: "'Comic Sans MS', cursive"}}>
-                            Confirmar pago
-                        </Button>
-                    </DialogFooter>
-                </DialogContent>
-            </Dialog>
+                <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
+                    <DialogContent className="sm:max-w-[425px]">
+                        <DialogHeader>
+                            <DialogTitle className="text-center text-xl" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                Número: {selectedNumber}
+                            </DialogTitle>
+                        </DialogHeader>
+
+                        {selectedNumber && isNumberRegistered(selectedNumber) && (
+                            <div className="grid gap-4 py-4">
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label className="text-right font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                        Nombre:
+                                    </Label>
+                                    <div className="col-span-3" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                        {getRegistration(selectedNumber)?.nombre}
+                                    </div>
+                                </div>
+
+                                <div className="grid grid-cols-4 items-center gap-4">
+                                    <Label className="text-right font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                        Teléfono:
+                                    </Label>
+                                    <div className="col-span-3" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                        {getRegistration(selectedNumber)?.telefono}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
+                        <DialogFooter>
+                            <Button onClick={handleDelete} variant="destructive" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                Eliminar
+                            </Button>
+                            <Button onClick={handleConfirmPay} className="bg-green-500 hover:bg-green-600" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                Confirmar pago
+                            </Button>
+                        </DialogFooter>
+                    </DialogContent>
+                </Dialog>
             </section>
+
             <section className="p-6 bg-rose-100 mt-25 rounded-lg shadow-lg max-w-xs text-center">
                 <h2 className="text-2xl font-bold text-rose-600">Información de la Rifa</h2>
-                <p className="mt-4 text-gray-700">Participa en esta gran rifa para recaudar fondos y ganar <strong>$500.000</strong></p>
-                <p className="mt-2 text-gray-700">Cada puesto tiene un precio de $20.000.</p>
-                <p className="mt-2 text-gray-700">Juega para el día <strong>12 de abril</strong> con la <strong>Lotería de Boyacá</strong>.</p>
-                <p className="mt-2 text-gray-700">Para realizar tu pago puedes hacerlo mediante <strong>Transferencia</strong> al siguiente número</p>
-                <p className="mt-2 text-gray-700"><strong>Nequi: 311 665 1620</strong> </p>
+                
+                <p className="mt-4 text-gray-700">
+                    Participa en esta gran rifa para recaudar fondos en la que podrás ganar{" "}
+                    <strong>Una Licuadora Osterizer</strong> en excelentes condiciones
+                </p>
+                
+                <p className="mt-2 text-gray-700">
+                    Cada puesto tiene un precio de <strong>$10.000</strong>.
+                </p>
+                
+                <p className="mt-2 text-gray-700">
+                    Juega para el día <strong>21 de octubre</strong> con la{" "}
+                    <strong>Lotería Motilón Noche</strong>.
+                </p>
+                
+                <p className="mt-2 text-gray-700">
+                    Para realizar tu pago puedes hacerlo mediante <strong>Transferencia</strong> al siguiente número <strong>Nequi:</strong>
+                </p>
+                
+                <p className="mt-2 text-gray-700 font-bold text-lg">
+                    311 665 1620
+                </p>
             </section>
-            </div>
-        )
+        </div>
+    )
 }
