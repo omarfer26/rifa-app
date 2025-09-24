@@ -285,41 +285,50 @@ export default function NumberTable() {
                         >
                         <DialogHeader>
                             <DialogTitle className="text-center text-xl" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
-                                Número: {selectedNumber}
+                            Número: {selectedNumber}
                             </DialogTitle>
                         </DialogHeader>
 
                         {selectedNumber && isNumberRegistered(selectedNumber) && (
                             <div className="grid gap-4 py-4">
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label className="text-right font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
-                                        Nombre:
-                                    </Label>
-                                    <div className="col-span-3" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
-                                        {getRegistration(selectedNumber)?.nombre}
-                                    </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label className="text-right font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                Nombre:
+                                </Label>
+                                <div className="col-span-3" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                {getRegistration(selectedNumber)?.nombre}
                                 </div>
+                            </div>
 
-                                <div className="grid grid-cols-4 items-center gap-4">
-                                    <Label className="text-right font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
-                                        Teléfono:
-                                    </Label>
-                                    <div className="col-span-3" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
-                                        {getRegistration(selectedNumber)?.telefono}
-                                    </div>
+                            <div className="grid grid-cols-4 items-center gap-4">
+                                <Label className="text-right font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                Teléfono:
+                                </Label>
+                                <div className="col-span-3" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                                {getRegistration(selectedNumber)?.telefono}
                                 </div>
+                            </div>
                             </div>
                         )}
 
-                        <DialogFooter className="flex flex-col md:flex-row gap-2">
-                            <Button onClick={handleDelete} variant="destructive" style={{ fontFamily: "'Comic Sans MS', cursive" }} className="w-full md:w-auto">
-                                Eliminar
+                        <DialogFooter className="flex flex-col md:flex-row gap-2 mt-4">
+                            <Button
+                            onClick={handleDelete}
+                            variant="destructive"
+                            style={{ fontFamily: "'Comic Sans MS', cursive" }}
+                            className="bg-red-500 hover:bg-red-600 w-full md:w-auto"
+                            >
+                            Eliminar
                             </Button>
-                            <Button onClick={handleConfirmPay} className="bg-green-500 hover:bg-green-600 w-full md:w-auto" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
-                                Confirmar pago
+                            <Button
+                            onClick={handleConfirmPay}
+                            className="bg-green-500 hover:bg-green-600 w-full md:w-auto"
+                            style={{ fontFamily: "'Comic Sans MS', cursive" }}
+                            >
+                            Confirmar pago
                             </Button>
                         </DialogFooter>
-                    </DialogContent>
+                        </DialogContent>
                 </Dialog>
             </section>
 
