@@ -17,7 +17,7 @@ interface Registration {
     pago?: boolean
 }
 
-const API_URL = "http://localhost:5000/registro"
+const API_URL = "/api/registro"
 
 export default function NumberTable() {
     const numbers = Array.from({ length: 100 }, (_, i) => i.toString().padStart(2, "0"))
