@@ -1,32 +1,22 @@
-import type { Metadata } from "next";
-import { Geist, Geist_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from 'next/font/google';
 import "./globals.css";
 
-const geistSans = Geist({
+const geistSans = Inter({
   variable: "--font-geist-sans",
   subsets: ["latin"],
 });
 
-const geistMono = Geist_Mono({
+const geistMono = JetBrains_Mono({
   variable: "--font-geist-mono",
   subsets: ["latin"],
 });
 
-export const metadata: Metadata = {
-  title: "Gran rifa",
-  description: "Sistema web creado para administrar una rifa",
-};
-
 export default function RootLayout({
   children,
-}: Readonly<{
-  children: React.ReactNode;
-}>) {
+}: Readonly<{ children: React.ReactNode }>) {
   return (
     <html lang="en">
-      <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
-      >
+      <body className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
         {children}
       </body>
     </html>
