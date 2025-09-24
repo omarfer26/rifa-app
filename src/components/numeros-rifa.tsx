@@ -6,8 +6,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { X } from "lucide-react"
-import { Check } from "lucide-react"
+import { X, Check } from "lucide-react"
 import * as XLSX from "xlsx"
 
 interface Registration {
@@ -72,31 +71,17 @@ export default function NumberTable() {
         setSearchResults(Array.from(matchingNumbers))
     }, [searchQuery, hashmap])
 
-    const isNumberRegistered = (number: string) => {
-        return registrations.some(reg => reg.number === number)
-    }
-
-    const getRegistration = (number: string) => {
-        return registrations.find(reg => reg.number === number)
-    }
-
+    const isNumberRegistered = (number: string) => registrations.some(reg => reg.number === number)
+    const getRegistration = (number: string) => registrations.find(reg => reg.number === number)
     const handleNumberClick = (number: string) => {
         setSelectedNumber(number)
-        if (isNumberRegistered(number)) {
-            setIsViewModalOpen(true)
-        } else {
-            setIsRegisterModalOpen(true)
-        }
+        if (isNumberRegistered(number)) setIsViewModalOpen(true)
+        else setIsRegisterModalOpen(true)
     }
 
     const handleRegister = async () => {
-        if (!nombre.trim() || !telefono.trim()) {
-            alert("Por favor complete todos los campos")
-            return
-        }
-
+        if (!nombre.trim() || !telefono.trim()) return alert("Por favor complete todos los campos")
         const newRegistration = { number: selectedNumber, nombre, telefono, pago }
-
         try {
             const response = await fetch(API_URL, {
                 method: "POST",
@@ -110,9 +95,7 @@ export default function NumberTable() {
                 setTelefono("")
                 setPago(false)
             }
-        } catch (error) {
-            console.error("Error saving registration:", error)
-        }
+        } catch (error) { console.error("Error saving registration:", error) }
     }
 
     const handleConfirmPay = async () => {
@@ -129,9 +112,7 @@ export default function NumberTable() {
                 setPago(true)
                 setIsViewModalOpen(false)
             }
-        } catch (error) {
-            console.error("Error updating payment status:", error)
-        }
+        } catch (error) { console.error("Error updating payment status:", error) }
     }
 
     const handleDelete = async () => {
@@ -141,28 +122,17 @@ export default function NumberTable() {
                 setRegistrations(registrations.filter(reg => reg.number !== selectedNumber))
                 setIsViewModalOpen(false)
             }
-        } catch (error) {
-            console.error("Error deleting registration:", error)
-        }
+        } catch (error) { console.error("Error deleting registration:", error) }
     }
 
-    if (loading) {
-        return (
-            <div className="flex justify-center items-center h-screen">
-                <p style={{ fontFamily: "'Comic Sans MS', cursive" }}>Cargando...</p>
-            </div>
-        )
-    }
+    if (loading) return (
+        <div className="flex justify-center items-center h-screen">
+            <p style={{ fontFamily: "'Comic Sans MS', cursive" }}>Cargando...</p>
+        </div>
+    )
 
     const generateExcel = () => {
-        type Registro = {
-            ID: number
-            Número: string
-            Nombre: string
-            Teléfono: string
-            Pago: string
-        }
-
+        type Registro = { ID: number; Número: string; Nombre: string; Teléfono: string; Pago: string }
         const dataWithIds: Registro[] = registrations.map((reg, index) => ({
             ID: index + 1,
             Número: reg.number.toString(),
@@ -170,48 +140,40 @@ export default function NumberTable() {
             Teléfono: reg.telefono,
             Pago: reg.pago ? "Sí" : "No"
         }))
-
         const ws = XLSX.utils.json_to_sheet(dataWithIds)
-
-        const colWidths = Object.keys(dataWithIds[0]).map((key: string) => ({
+        ws["!cols"] = Object.keys(dataWithIds[0]).map((key: string) => ({
             wch: Math.max(
                 key.length,
                 ...dataWithIds.map(row => row[key as keyof Registro]?.toString().length ?? 10)
             ) + 2
         }))
-
-        ws["!cols"] = colWidths
-
         const wb = XLSX.utils.book_new()
         XLSX.utils.book_append_sheet(wb, ws, "Registros")
         XLSX.writeFile(wb, "rifa_registrations.xlsx")
     }
 
     return (
-        <div className="flex flex-row justify-center items-start gap-6 p-6">
-            <section className="p-6 bg-rose-100 mt-25 rounded-lg shadow-lg max-w-xs text-center">
-                    <Image
-                        src="/foto.jpg"
-                        alt="Premio"
-                        width={250}
-                        height={250}
-                        className="rounded-lg shadow-md"
-                    />
-                    <p className="text-center mt-2 font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
-                        Premio:
-                    </p>
+        <div className="flex flex-col md:flex-row justify-center items-start gap-6 p-4 md:p-6">
+            <section className="p-4 md:p-6 bg-rose-100 rounded-lg shadow-lg max-w-xs text-center flex-shrink-0">
+                <Image
+                    src="/foto.jpg"
+                    alt="Premio"
+                    width={250}
+                    height={250}
+                    className="rounded-lg shadow-md mx-auto"
+                />
+                <p className="text-center mt-2 font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                    Premio:
+                </p>
             </section>
 
-            <section className="flex flex-col items-center p-6 bg-white rounded-lg shadow-lg max-w-3xl">
-                <h1
-                    className="text-4xl font-bold mb-6 text-center text-rose-600"
-                    style={{ fontFamily: "'Comic Sans MS', cursive" }}
-                >
+            <section className="flex flex-col items-center p-4 md:p-6 bg-white rounded-lg shadow-lg w-full md:max-w-3xl">
+                <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center text-rose-600" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
                     Gran rifa
                 </h1>
 
-                <div className="border-4 border-rose-500 rounded-md overflow-hidden bg-white">
-                    <table className="border-collapse">
+                <div className="overflow-x-auto w-full">
+                    <table className="border-collapse w-full">
                         <tbody>
                             {Array.from({ length: 10 }, (_, rowIndex) => (
                                 <tr key={rowIndex}>
@@ -220,21 +182,20 @@ export default function NumberTable() {
                                         const number = numbers[index]
                                         const registered = isNumberRegistered(number)
                                         const highlighted = searchResults.includes(number)
-
                                         return (
                                             <td
                                                 key={colIndex}
-                                                className={`border border-rose-300 w-12 h-12 text-center hover:bg-rose-100 transition-colors cursor-pointer relative ${registered ? "bg-rose-50" : ""} ${highlighted ? "bg-yellow-200" : ""}`}
+                                                className={`border border-rose-300 w-8 md:w-12 h-8 md:h-12 text-center hover:bg-rose-100 transition-colors cursor-pointer relative ${registered ? "bg-rose-50" : ""} ${highlighted ? "bg-yellow-200" : ""}`}
                                                 style={{ fontFamily: "'Comic Sans MS', cursive" }}
                                                 onClick={() => handleNumberClick(number)}
                                             >
                                                 {number}
                                                 {registered && (
-                                                    <div className="absolute inset-0 flex items-center justify-center text-rose-600 font-bold text-3xl">
+                                                    <div className="absolute inset-0 flex items-center justify-center text-rose-600 font-bold text-xl md:text-3xl animate-fadeIn">
                                                         {getRegistration(number)?.pago ? (
-                                                            <Check className="w-8 h-8 stroke-2 text-green-600" />
+                                                            <Check className="w-5 md:w-8 h-5 md:h-8 stroke-2 text-green-600" />
                                                         ) : (
-                                                            <X className="w-8 h-8 stroke-2" />
+                                                            <X className="w-5 md:w-8 h-5 md:h-8 stroke-2" />
                                                         )}
                                                     </div>
                                                 )}
@@ -246,10 +207,10 @@ export default function NumberTable() {
                         </tbody>
                     </table>
                 </div>
-                <br></br>                            
-                <div className="mt-4 text-xs text-gray-500">Registros guardados: {registrations.length}</div>
+
+                <div className="mt-4 text-xs md:text-sm text-gray-500">Registros guardados: {registrations.length}</div>
                 <br />
-                <Button onClick={generateExcel} className="mb-4 bg-green-500 hover:bg-green-600">
+                <Button onClick={generateExcel} className="mb-4 bg-green-500 hover:bg-green-600 w-full md:w-auto">
                     Descargar Registros
                 </Button>
 
@@ -258,11 +219,19 @@ export default function NumberTable() {
                     placeholder="Buscar por nombre..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="mb-4 w-80 p-2 border border-gray-400 rounded"
+                    className="mb-4 w-full md:w-80 p-2 border border-gray-400 rounded"
                 />
 
                 <Dialog open={isRegisterModalOpen} onOpenChange={setIsRegisterModalOpen}>
-                    <DialogContent className="sm:max-w-[425px]">
+                    <div
+                        className={`fixed inset-0 bg-black/50 backdrop-blur-sm flex justify-center items-center z-40 ${
+                        isViewModalOpen ? "block" : "hidden"
+                        }`}
+                    >
+                    <DialogContent
+                        className="sm:max-w-[425px] rounded-lg shadow-lg p-4 animate-fadeIn scale-95 transition-transform duration-300 z-50"
+                        style={{ backgroundColor: "white" }}
+                        >
                         <DialogHeader>
                             <DialogTitle className="text-center text-xl" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
                                 Número: {selectedNumber}
@@ -299,17 +268,21 @@ export default function NumberTable() {
                         <DialogFooter>
                             <Button
                                 onClick={handleRegister}
-                                className="bg-rose-500 hover:bg-rose-600"
+                                className="bg-rose-500 hover:bg-rose-600 w-full"
                                 style={{ fontFamily: "'Comic Sans MS', cursive" }}
                             >
                                 Anotar
                             </Button>
                         </DialogFooter>
                     </DialogContent>
+                    </div>
                 </Dialog>
-
+                
                 <Dialog open={isViewModalOpen} onOpenChange={setIsViewModalOpen}>
-                    <DialogContent className="sm:max-w-[425px]">
+                    <DialogContent
+                        className="sm:max-w-[425px] rounded-lg shadow-lg p-4 animate-fadeIn scale-95 transition-transform duration-300 z-50"
+                        style={{ backgroundColor: "white" }}
+                        >
                         <DialogHeader>
                             <DialogTitle className="text-center text-xl" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
                                 Número: {selectedNumber}
@@ -338,11 +311,11 @@ export default function NumberTable() {
                             </div>
                         )}
 
-                        <DialogFooter>
-                            <Button onClick={handleDelete} variant="destructive" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                        <DialogFooter className="flex flex-col md:flex-row gap-2">
+                            <Button onClick={handleDelete} variant="destructive" style={{ fontFamily: "'Comic Sans MS', cursive" }} className="w-full md:w-auto">
                                 Eliminar
                             </Button>
-                            <Button onClick={handleConfirmPay} className="bg-green-500 hover:bg-green-600" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
+                            <Button onClick={handleConfirmPay} className="bg-green-500 hover:bg-green-600 w-full md:w-auto" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
                                 Confirmar pago
                             </Button>
                         </DialogFooter>
@@ -350,27 +323,22 @@ export default function NumberTable() {
                 </Dialog>
             </section>
 
-            <section className="p-6 bg-rose-100 mt-25 rounded-lg shadow-lg max-w-xs text-center">
+            <section className="p-4 md:p-6 bg-rose-100 rounded-lg shadow-lg max-w-xs w-full md:w-auto text-center flex-shrink-0">
                 <h2 className="text-2xl font-bold text-rose-600">Información de la Rifa</h2>
-                
                 <p className="mt-4 text-gray-700">
                     Participa en esta gran rifa para recaudar fondos en la que podrás ganar{" "}
                     <strong>Una Licuadora Osterizer</strong> en excelentes condiciones
                 </p>
-                
                 <p className="mt-2 text-gray-700">
                     Cada puesto tiene un precio de <strong>$10.000</strong>.
                 </p>
-                
                 <p className="mt-2 text-gray-700">
                     Juega para el día <strong>21 de octubre</strong> con la{" "}
                     <strong>Lotería Motilón Noche</strong>.
                 </p>
-                
                 <p className="mt-2 text-gray-700">
                     Para realizar tu pago puedes hacerlo mediante <strong>Transferencia</strong> al siguiente número <strong>Nequi:</strong>
                 </p>
-                
                 <p className="mt-2 text-gray-700 font-bold text-lg">
                     311 665 1620
                 </p>
