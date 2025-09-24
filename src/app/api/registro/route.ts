@@ -1,11 +1,15 @@
-import { NextRequest, NextResponse } from "next/server";
 import { PrismaClient } from "@prisma/client";
+import { NextRequest, NextResponse } from "next/server";
 
 const prisma = new PrismaClient();
 
 export async function GET() {
-  const registros = await prisma.registro.findMany();
-  return NextResponse.json(registros);
+  try {
+    const registros = await prisma.registro.findMany();
+    return NextResponse.json(registros);
+  } catch (error) {
+    return NextResponse.json({ error: "Error al obtener registros" }, { status: 500 });
+  }
 }
 
 export async function POST(req: NextRequest) {
