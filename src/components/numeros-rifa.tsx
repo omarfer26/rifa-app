@@ -154,19 +154,6 @@ export default function NumberTable() {
 
     return (
         <div className="flex flex-col md:flex-row justify-center items-start gap-6 p-4 md:p-6">
-            <section className="p-4 md:p-6 bg-rose-100 rounded-lg shadow-lg max-w-xs text-center flex-shrink-0">
-                <Image
-                    src="/foto.jpg"
-                    alt="Premio"
-                    width={250}
-                    height={250}
-                    className="rounded-lg shadow-md mx-auto"
-                />
-                <p className="text-center mt-2 font-bold" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
-                    Premio:
-                </p>
-            </section>
-
             <section className="flex flex-col items-center p-4 md:p-6 bg-white rounded-lg shadow-lg w-full md:max-w-3xl">
                 <h1 className="text-3xl md:text-4xl font-bold mb-6 text-center text-rose-600" style={{ fontFamily: "'Comic Sans MS', cursive" }}>
                     Gran rifa
@@ -333,23 +320,23 @@ export default function NumberTable() {
             </section>
 
             <section className="p-4 md:p-6 bg-rose-100 rounded-lg shadow-lg max-w-xs w-full md:w-auto text-center flex-shrink-0">
-                <h2 className="text-2xl font-bold text-rose-600">Información de la Rifa</h2>
+                <h2 className="text-2xl font-bold text-rose-600">Información general:</h2>
                 <p className="mt-4 text-gray-700">
                     Participa en esta gran rifa para recaudar fondos en la que podrás ganar{" "}
-                    <strong>Una Licuadora Osterizer</strong> en excelentes condiciones
+                    <strong>$300.000</strong>
                 </p>
                 <p className="mt-2 text-gray-700">
                     Cada puesto tiene un precio de <strong>$10.000</strong>.
                 </p>
                 <p className="mt-2 text-gray-700">
-                    Juega para el día <strong>21 de octubre</strong> con la{" "}
-                    <strong>Lotería Motilón Noche</strong>.
+                    Juega para el día <strong>15 de noviembre</strong> con la{" "}
+                    <strong>Lotería de Boyaca</strong>.
                 </p>
                 <p className="mt-2 text-gray-700">
                     Para realizar tu pago puedes hacerlo mediante <strong>Transferencia</strong> al siguiente número <strong>Nequi:</strong>
                 </p>
                 <p className="mt-2 text-gray-700 font-bold text-lg">
-                    311 665 1620
+                    314 618 8276
                 </p>
             </section>
         </div>
