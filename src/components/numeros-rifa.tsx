@@ -329,7 +329,7 @@ export default function NumberTable() {
                     Cada puesto tiene un precio de <strong>$10.000</strong>.
                 </p>
                 <p className="mt-2 text-gray-700">
-                    Juega para el día <strong>15 de noviembre</strong> con la{" "}
+                    Juega para el día <strong>22 de noviembre</strong> con la{" "}
                     <strong>Lotería de Boyaca</strong>.
                 </p>
                 <p className="mt-2 text-gray-700">
